@@ -1,0 +1,39 @@
+Working individually.
+
+General project idea: I would like to create a text-based game of checkers. This would 
+allow a person to play against either against another person or a bot in the game of 
+checkers. The updated board -- and potentially other metadata, depending on how it is 
+implemented -- would appear in the terminal after each move. 
+
+I suppose for I would need to have a better understanding of checkers for any implementation 
+as I have not played the game for a few years, but I don't expect this to be overly difficult. 
+
+Easy implementation: The checkers game would be set up in a player v. player way,
+without any "versus bot" option. Ie, there's only the two-player mode (unless 
+one person wishes to go against themself, but that's not the point of how to play). 
+The most "difficult" part about this would be implementating the game logic: keeping
+track of the turn, figuring out where the pieces are, and so on. I would also like 
+to add a timer and a music component into this implementation -- which seems to have 
+some available libraries to support this.
+
+Medium implementation: In this version, it would still be a checkers game. However, 
+instead of person versus person (2-player mode), this version would only support 
+player v. bot. So, it's one person going against an automated system. The difficult
+part about this implementation would be creating the automated system / bot to play 
+against the player. I would look into mini-max evaluation and alpha-beta for this 
+implementation. I would also have to look into start-game and end-game strategy 
+to help with runtime, such that I don't need to literally evaluate every single 
+move. This implementation would likely not have the timer / music component that 
+the easy implemenation would have either, just due to time constraints, though 
+I'm open to negotiation on this. 
+-- The source of inspiration is a conversation with Professor Kurtz. 
+
+Challenge implementation: This version would build upon the medium implementation. 
+After creating the player v. bot implementation / have that working with the 
+mini-max evluation and the alpha-beta, I would create more "modes" of checkers 
+that the player could choose. For instance, a mode where every five moves, a 
+completely random move would be chosen for the player. Or one of the pieces, if 
+captured, would result in the loss of the game (like the king in chess). I think 
+that this would be more challenging because I would have to shift game logic to 
+allow for different strategies (as well as code the bot to play well with said 
+different strategies).
