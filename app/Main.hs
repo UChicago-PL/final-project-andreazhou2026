@@ -110,13 +110,13 @@ isValidCapture board (srcRow, srcCol) (dstRow, dstCol) =
 checkWin :: Board -> Maybe String
 checkWin board
     | not (any isPlayerPiece board) = Just "Bot wins!"
-    | not (any isBotPiece board)    = Just "Player wins!"
-    | not (canMove board Player)    = Just "Bot wins!"
-    | not (canMove board Bot)       = Just "Player wins!"
-    | otherwise                     = Nothing
+    | not (any isBotPiece board) = Just "Player wins!"
+    | not (canMove board Player) = Just "Bot wins!"
+    | not (canMove board Bot) = Just "Player wins!"
+    | otherwise = Nothing
   where
     isPlayerPiece = any (\p -> p == Player || p == PlayerKing)
-    isBotPiece    = any (\p -> p == Bot || p == BotKing)
+    isBotPiece = any (\p -> p == Bot || p == BotKing)
 
 -- sees if a piece has any moves left
 canMove :: Board -> Piece -> Bool
