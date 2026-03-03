@@ -1,0 +1,12 @@
+cabal build + cabal run to start the program 
+
+There is a purposeful threadDelay after each move to simulate an actual move done. I'm bringing this up to mention that any perceived delay might be coming from here and not from runtime.
+
+At the moment, the user is able to play checkers against themself. There aren't any guardrails to prevent them going twice. I didn't see much point in implementing that yet since the goal is to have a bot respond automatically anyways, so it wasn't necessary to explicitly implement that for the purposes of the progress report. 
+
+A few deviations from checkers to mention:
+1. I didn't implement forceful captures (ie, if there's a piece that one side can take, they're not forced to take it)
+2. I didn't implement multiple captures (ie, if there are two pieces that one piece can capture, the user can only make the first capture)
+All other checker rules (ex, where pieces can move) should be properly implemented. I did simulate a few games with myself to test for this, and it seems to be running smoothly.
+
+I think given the time remaining, I will focus on implementing the bot rather than figuring out capture logic.

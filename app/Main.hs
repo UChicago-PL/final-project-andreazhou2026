@@ -63,6 +63,7 @@ getPlayerMove = do
   where
     invalidInput = do
         putStrLn "Invalid input, try again."
+        putStrLn ""
         getPlayerMove 
 
 -- checks if a position input string is valid 
@@ -101,10 +102,28 @@ isValidMove board (srcRow, srcCol) (dstRow, dstCol) =
 isValidCapture :: Board -> (Int, Int) -> (Int, Int) -> Bool
 isValidCapture board (srcRow, srcCol) (dstRow, dstCol) =
     let piece = (board !! srcRow) !! srcCol
+        rowDiff = dstRow - srcRow
+        colDiff = dstCol - srcCol
+        absRowDiff = abs rowDiff
+        absColDiff = abs colDiff
         midRow = (srcRow + dstRow) `div` 2
         midCol = (srcCol + dstCol) `div` 2
         midPiece = (board !! midRow) !! midCol
-    in piece /= Empty && midPiece `elem` [Player, Bot] && (board !! dstRow) !! dstCol == Empty
+        destEmpty = (board !! dstRow) !! dstCol == Empty
+        correctDirection = case piece of
+            Player -> rowDiff == -2
+            Bot -> rowDiff == 2
+            PlayerKing -> absRowDiff == 2
+            BotKing -> absRowDiff == 2
+            _ -> False
+        diagonal = absRowDiff == 2 && absColDiff == 2
+        isEnemy = case piece of
+            Player -> midPiece `elem` [Bot, BotKing]
+            PlayerKing -> midPiece `elem` [Bot, BotKing]
+            Bot -> midPiece `elem` [Player, PlayerKing]
+            BotKing -> midPiece `elem` [Player, PlayerKing]
+            _ -> False
+    in piece /= Empty && diagonal && correctDirection && isEnemy && destEmpty
 
 -- sees if someone's won
 checkWin :: Board -> Maybe String
@@ -125,8 +144,7 @@ canMove board pieceType = any pieceHasMoves allPositions
     allPositions = [(r,c) | r <- [0..7], c <- [0..7]]
     pieceHasMoves (r,c) =
         let piece = (board !! r) !! c
-        in piece == pieceType &&
-           any (\(dr,dc) -> isValidMove board (r,c) (dr,dc) || isValidCapture board (r,c) (dr,dc)) allPositions
+        in piece == pieceType && any (\(dr,dc) -> isValidMove board (r,c) (dr,dc) || isValidCapture board (r,c) (dr,dc)) allPositions
 
 -- makes the actual move on the board by adding and removing a piece, which simulates moving a piece; has a check for capture
 makeMove :: Board -> (Int, Int) -> (Int, Int) -> Bool -> Board
