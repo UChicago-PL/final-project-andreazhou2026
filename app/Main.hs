@@ -1,6 +1,7 @@
 module Main where
 import Data.Char (toLower, digitToInt)
 import Control.Concurrent (threadDelay)
+import System.Exit (exitSuccess)
 
 data Piece = Empty | Player | Bot | PlayerKing | BotKing
   deriving (Eq, Show)
@@ -35,20 +36,41 @@ displayBoard board = do
     -- translating each piece into a string to show in IO
     showPiece :: Piece -> String
     showPiece Empty = ". "
-    showPiece Player = "X "
-    showPiece Bot = "O "
-    showPiece PlayerKing = "x "
-    showPiece BotKing = "o "
+    showPiece Player = "x "
+    showPiece Bot = "o "
+    showPiece PlayerKing = "X "
+    showPiece BotKing = "O "
 
 -- receives player input from terminal
 getPlayerMove :: IO ((Int, Int), (Int, Int))
 getPlayerMove = do
-    putStrLn "Enter move (e.g., A1 B2 would move the piece at A1 to the space at B2):"
+    putStrLn "Enter move (ex. C6 B5 for C6 -> B5) or type 'quit' to end game: "
     move <- getLine
-    let [src, dst] = words move
-        srcPos = parsePosition src
-        dstPos = parsePosition dst
-    return (srcPos, dstPos)
+    case map toLower move of
+        "quit" -> do
+            putStrLn "You quit the game! Rerun the program if you'd like to play again."
+            exitSuccess
+        _ -> do
+            let ws = words move
+            if length ws /= 2
+                then invalidInput
+                else do
+                    let srcStr = head ws
+                        dstStr = ws !! 1
+                    if validPos srcStr && validPos dstStr
+                        then return (parsePosition srcStr, parsePosition dstStr)
+                        else invalidInput
+  where
+    invalidInput = do
+        putStrLn "Invalid input, try again."
+        getPlayerMove 
+
+-- checks if a position input string is valid 
+validPos :: String -> Bool
+validPos [col,row] =
+    let c = toLower col
+    in c >= 'a' && c <= 'h' && row >= '1' && row <= '8'
+validPos _ = False
 
 -- convers the board position received from getPlayerMove into a (x, y) tuple
 parsePosition :: String -> (Int, Int)
@@ -149,8 +171,6 @@ gameLoop board = do
         Just winner -> putStrLn winner 
         Nothing -> do
             (srcPos, dstPos) <- getPlayerMove
-            let (srcRow, srcCol) = srcPos
-            let (dstRow, dstCol) = dstPos
             -- for capture
             if isValidCapture board srcPos dstPos then do
                 putStrLn ""
