@@ -1,0 +1,8 @@
+Mini-Max Evaluation Videos / Other Sources:
+Algorithms Explained – minimax and alpha-beta pruning: https://www.youtube.com/watch?v=l-hh51ncgDI
+Minimax: How Computers Play Games: https://www.youtube.com/watch?v=SLgZhpDsrfc
+Simple Explanation of the Minimax Algorithm with Tic-Tac-Toe: https://www.youtube.com/watch?v=5y2a0Zhgq0U
+1. MiniMax Search Algorithm Solved Example | Min Max Search Artificial Intelligence by Mahesh Huddar: https://www.youtube.com/watch?v=tDv7lrklaQE
+MiniMax checkers overview: https://sites.google.com/view/lazyy/home
+Implementing the Minimax Algorithm for AI in Python (Tic Tac Toe): https://www.datacamp.com/tutorial/minimax-algorithm-for-ai-in-python
+

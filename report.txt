@@ -1,0 +1,40 @@
+In case my video presentation doesn't work, here's the link: 
+https://drive.google.com/file/d/1uJfg3Y5nKgBb1qMo_bJHDYJR3pAAIjlJ/view?usp=sharing 
+
+Slideshow Presentation/Link:
+https://docs.google.com/presentation/d/1RIigOxnGdGmOSkaBRsb1XBijLJkke-7jRKe8_Lqh254/edit?usp=sharing
+
+How to interact with the project / basics of how the design works: 
+-- cabal build (once)
+-- cabal run to start the program 
+-- You (the player) have the first move and are represented by the x pieces
+-- Your opponent has the second move and is represented by the o pieces 
+-- If your piece makes it to the end of the board, your x pieces changes into a king and is represented by an X 
+-- If the opponent's piece makes it to the end of the board, the o piece changes into a king and is represented by an O
+-- You make the move by typing the position of the piece you want to move as well as the position of where you want that piece to move to 
+-- --> For instance, if your piece is at C6 and you want to move it to B5, you type C6 B5 
+-- The positions are represented from A->H and 1->8 
+-- After you make your move, the bot moves a piece. The piece the bot moves is shown above the new board
+-- The game continues until one of 3 conditions is met: 1. the bot wins; 2. you win; 3. you quit the game 
+-- If you want to quit the game, you can type in "quit" to quit the game 
+
+Main.hs: contains all the code for the game to function
+The code can be considered divided into two parts. Part 1 as the user side (ex. asking for their move, updating the board) and the game logic (ex. capture a piece, if a move is valid). This was largely implemented in progress, with a few minor updates to accomodate for the bot. Part 2 is the bot, which incorporates a mini-max evaluation. In addition, for user purposes, it does print the move of the bot (ex. "Bot move: F3 E4") into the terminal as well. There are comments for each function in the code. For the more complicated functions, I've added sub-comments to explain what was going on. 
+A couple functions that I'll note here (the ones where the comments couldn't explain my thought process):
+-- displayBoard: I chose to label the columns with A->H and the rows from 1->8. I originally didn't have this, which made reading the positions of the piece really difficult. I should also talk about my choice of x v X and o v O here. I'm aware that this is likely not the best way to indicate if a piece has become a king, as it's possible to confuse x and X, as well as o and O, due to the similarities of the piece. However, I realized that it would likely be more confusing if I changed the king pieces to an entirely different letter, so I kept it as x/X and o/O. I picked x and o because I think they're commonly used to represent game pieces (such as in tic tac toe).
+-- getPlayerMove: I originally set this up so that any incorrect input would stop the game. While testing the game, I kept putting in incorrect moves and as such I updated this to be more forgiving -- asking the user to re-input text and having to type out "quit" to leave the program. 
+-- evaluateBoard: Since mini-max evluation requires a way to calculate the value of pieces, I had to set a numeric value to each piece. Of course, each non-king piece and each king piece should cost the same. I came across the issue of trying to figure out the difference between the non-king and king pieces. I chose 2 and 5 because I think a king piece is much more valuation than a non-king piece, and it should encourage the program to highly value king pieces. That said, the specific values were rather arbitrary (I didn't want to directly search up how to evaluate each piece in terms of values / for mini-max evaluation since that likely meant I'd find an implementation of the mini-max evluation for checkers).
+-- bestBotMove: I picked the depth of 3 somewhat-arbitarily (bot considers bot movements + player movements). I didn't want to pick too high of a number in case the program starts to take too long. With the depth of 3, I haven't noticed any non-purposeful delay. This may be in part be because there aren't that many moves in checkers.
+-- botTurn: I realized when testing the game, that not seeing where the bot moved (even with the updated board) was difficult. So in addition to moving the bot piece, I printed the string of the bot move in the IO.
+
+How the project has developed since progress.txt: 
+-- Bot functionality / mini-max evaluation has been implemented since progress.txt. 
+
+Components of proposal.txt that's been added (overall): 
+-- Checkers game board with good UI (easy implemenation)
+-- Player v. Bot, with mini-max evaluation for Bot (medium implemenation)
+
+Limitations: 
+-- music: I wanted to add sound effects / background music while this was running. While searching up how to incorporate music in Haskell using haskell-player, I ran into 502 Gateway Errors, which meant that I couldn't actually see the functions in that package. 
+-- As mentioned in the progress report, I didn't implement forceful captures or mutliple captures, so there are deviations / simplifications from the actual checkers game. 
+-- The player is able to move the bot's pieces instead of their own (although still limited to one move per turn). 

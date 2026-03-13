@@ -7,6 +7,7 @@ data Piece = Empty | Player | Bot | PlayerKing | BotKing
   deriving (Eq, Show)
 
 type Board = [[Piece]]
+type Move = ((Int,Int),(Int,Int))
 
 -- initial board setup, that will be updated with each later move
 initialBoard :: Board
@@ -73,7 +74,7 @@ validPos [col,row] =
     in c >= 'a' && c <= 'h' && row >= '1' && row <= '8'
 validPos _ = False
 
--- convers the board position received from getPlayerMove into a (x, y) tuple
+-- converts the board position received from getPlayerMove into a (x, y) tuple
 parsePosition :: String -> (Int, Int)
 parsePosition pos = (row, col)
   where
@@ -179,7 +180,78 @@ placePiece board (row, col) piece =
         (left, _:right) = splitAt col target
     in before ++ (left ++ piece : right) : after
 
--- keeps the game running until incorrect command is put in
+
+-- bot / mini-max eval stuff
+-- board evaluation from the perspective of the bot, kings as more valuable than normal pieces
+evaluateBoard :: Board -> Int
+evaluateBoard board = sum (map pieceValue (concat board))
+  where
+    pieceValue Bot = 2
+    pieceValue BotKing = 5
+    pieceValue Player = -2
+    pieceValue PlayerKing = -5
+    pieceValue Empty = 0
+
+-- all possible moves for the bot and the player; for the bot's evaluation
+allMoves :: Board -> Piece -> [Move]
+allMoves board pieceType =
+    [((r,c),(dr,dc)) |
+        r <- [0..7], c <- [0..7],
+        let piece = board !! r !! c,
+        piece == pieceType || piece == kingType pieceType,
+        dr <- [0..7], dc <- [0..7],
+        isValidMove board (r,c) (dr,dc) || isValidCapture board (r,c) (dr,dc)
+    ] 
+    where
+    kingType Player = PlayerKing
+    kingType Bot = BotKing
+    kingType _ = Empty
+
+-- creates hypothetical boards based on hypothetical moves
+applyMove :: Board -> Move -> Board
+applyMove board (src,dst)
+    | isValidCapture board src dst = makeMove board src dst True
+    | otherwise = makeMove board src dst False
+
+-- minimax evaluation
+minimax :: Board -> Int -> Bool -> Int
+minimax board depth maximizing
+    | depth == 0 = evaluateBoard board
+    | otherwise =
+        if maximizing
+        then maximum scores -- bot's best outcome
+        else minimum scores -- player's best outcome
+    where
+    moves = if maximizing
+            then allMoves board Bot
+            else allMoves board Player
+    boards = map (applyMove board) moves
+    -- recursively grabs and evaluates the boards
+    scores = map (\b -> minimax b (depth-1) (not maximizing)) boards
+
+-- figures out the best move for the bot
+bestBotMove :: Board -> Move
+-- depth 3
+bestBotMove board = snd $ maximum [(minimax (applyMove board m) 3 False, m) | m <- moves] where
+    moves = allMoves board Bot
+
+-- helper function to make where the bot moves readable for the user
+posToString :: (Int,Int) -> String
+posToString (row,col) = toEnum (col + fromEnum 'A') : show (row + 1)
+
+-- bot actually moves and returns the board
+botTurn :: Board -> IO Board
+botTurn board = do
+    let move@(src, dst) = bestBotMove board
+    let newBoard = applyMove board move
+    let srcStr = posToString src
+    let dstStr = posToString dst
+    putStrLn ("Bot move: " ++ srcStr ++ " " ++ dstStr)
+    putStrLn ""
+    return newBoard
+
+
+-- keeps the game running until quit command is put in
 gameLoop :: Board -> IO ()
 gameLoop board = do
     -- delay to simulate that the move is being done in real time 
@@ -193,16 +265,19 @@ gameLoop board = do
             if isValidCapture board srcPos dstPos then do
                 putStrLn ""
                 let newBoard = makeMove board srcPos dstPos True
-                gameLoop newBoard
+                botBoard <- botTurn newBoard
+                gameLoop botBoard
             -- regular move
             else if isValidMove board srcPos dstPos then do
                 putStrLn ""
                 let newBoard = makeMove board srcPos dstPos False
-                gameLoop newBoard
+                botBoard <- botTurn newBoard
+                gameLoop botBoard
             else do
                 putStrLn "Invalid move, try again."
                 putStrLn ""
                 gameLoop board
+
 
 main :: IO ()
 main = do
